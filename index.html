@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>intelfy</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <main>
+        <section id="hero">
+            <header>
+                <img src="logo.svg" alt="intelfy logo" class="logo">
+            </header>
+            <video autoplay muted loop playsinline id="background-video" class="hero-background">
+                <source src="https://storage.googleapis.com/video_intelfy/bg.mp4" type="video/mp4">
+            </video>
+            <img id="hero-video-fallback" class="hero-background hidden" src="bgf.png">
+            <div class="hero-content">
+                <div class="hero-text-box">  
+                <div class="pill">$dev_team.exe encountered an unexpected error (resource unavailable, try again later)</div>
+                    <h1>We are working. <span class="unbreakable-group">We are <span class="word-cycler-wrapper"><span id="word-cycler"></span></span></span></h1>
+        </div>
+        <p>[just now] dm from <span class="hello" style="font-weight:600;"><a href="mailto:hello@intelfy.dk">hello@intelfy.dk</a></span>:</p><p>___</p><p>Hi. We're still in stealth while we build some pretty cool complex AI-augmented solutions to really simple problems. It's quite something. It's basically rocket science but for web apps. You're going to love it. But for now, you'll have to wait. There's a taste below, however.<br />___</p>
+                </div>
+            
+            <a href="#showcase" class="scroll-down">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                </svg>
+            </a>
+        </section>
+
+        <section id="showcase">
+            <div class="showcase-container">
+                <div class="slider-column">
+    <div class="slider-image-container">
+        <div id="slider-image" class="slider-image">
+             <img src="1.png" alt="Gift Guide landing page">
+        </div>
+        <button id="prev-button" class="slider-arrow">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
+        </button>
+        <button id="next-button" class="slider-arrow">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+        </button>
+    </div>
+    <div class="slider-nav">
+        <span class="dot active" data-index="0"></span>
+        <span class="dot" data-index="1"></span>
+        <span class="dot" data-index="2"></span>
+        <span class="dot" data-index="3"></span>
+    </div>
+</div>
+                <div class="text-column">
+                    <div id="slider-text-content">
+                        <h2>Et voilà! An AI gift guide. But wait!</h2>
+                        <p>On the surface, this seems like a pretty simple web app. You open the site, you answer a few questions, we recommend the perfect gift for your mom, your partner, whomever it is you like on this particular day.</p>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+        <a href="#tools" id="showcase-scroll-down" class="scroll-down">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+            </svg>
+        </a>
+
+    
+        </section>
+
+
+        <section id="tools">
+            <div class="tools-content">
+                <h2>Some of the tools we are working with:</h2>
+                <div class="logo-grid">
+                    <div class="logo-item">
+                        <img src="cloudflare.svg" alt="Cloudflare logo">
+                        <p>Cloudflare</p>
+                    </div>
+                    <div class="logo-item">
+                        <img src="github.svg" alt="GitHub logo">
+                        <p>GitHub</p>
+                    </div>
+                    <div class="logo-item">
+                        <img src="openai.svg" alt="OpenAI logo">
+                        <p>OpenAI</p>
+                    </div>
+                    <div class="logo-item">
+                        <img src="gemini.svg" alt="Google Gemini logo">
+                        <p>Google Gemini</p>
+                    </div>
+                    <div class="logo-item">
+                        <img src="netlify.svg" alt="Netlify logo">
+                        <p>Netlify</p>
+                    </div>
+                    <div class="logo-item">
+                        <img src="mongodb.svg" alt="MongoDB logo">
+                        <p>MongoDB</p>
+                    </div>
+                    <div class="logo-item">
+                        <img src="nextjs.svg" alt="Next.js logo">
+                        <p>Next.js</p>
+                    </div>
+                    <div class="logo-item">
+                        <img src="notion.svg" alt="Notion logo">
+                        <p>Notion</p>
+                    </div>
+                </div>
+            </div>
+            <footer class="site-footer">
+        <p>&copy; 2025 intelfy. All rights reserved. Copenhagen, Denmark. || contact us at <span class="hello"><a href="mailto:hello@intelfy.dk">hello@intelfy.dk</a></span></p>
+    </footer>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
