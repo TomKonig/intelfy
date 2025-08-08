@@ -38,16 +38,36 @@ section {
     position: absolute;
     top: 0;
     left: 0;
+    width:100%;
+}
+
+#hero header nav {
+    position:absolute;
+    display:block;
+    right:2rem;
+    top:2rem;
+}
+
+#hero header nav li {
+    display:inline-block;
+    margin:0 1rem;
+    text-transform:lowercase;
+    font-weight:400;
+}
+
+#hero header nav li a {
+    color:white;
+    text-decoration: none;
+}
+
+#hero header nav li a:hover {
+    color: #e9e9e9;
 }
 
 .logo {
-    height:6em;
     margin:1rem;
-}
-.logo img {
-    width: 100%;
-    height: auto;
-    margin-left: 5vw;
+    float:left;
+    height: 6rem;
     display: block;
 }
 
@@ -297,6 +317,7 @@ h2 {
 
 .tools-content {
     text-align: center;
+    
 }
 
 .tools-content h2 {
@@ -321,6 +342,11 @@ h2 {
     width: 120px; /* Add this line */
 }
 
+.logo-item a {
+    text-decoration: none;
+    color: inherit; /* Inherit color from parent */
+}
+
 .logo-item img {
     height: 60px;
     /* Default grayscale state */
@@ -343,11 +369,18 @@ h2 {
 
 .site-footer {
     position: absolute;
+    margin: auto;
     bottom: 2rem;
     width: 100%;
     text-align: center;
     font-size: 0.8rem;
     color: rgba(255, 255, 255, 0.4);
+}
+
+.site-footer .privacy-note {
+    margin: auto;
+    margin-bottom: 1rem;
+    width:60%;
 }
 
     .hello {
@@ -383,6 +416,10 @@ background-clip: text; /* For other browsers */
         gap: 3rem;
     }
 }
+
+    .site-footer .privacy-note {
+        width:80%;
+    }
 
 
 @media screen and (max-width: 500px) {
@@ -452,6 +489,11 @@ background-clip: text; /* For other browsers */
     .slider-column { order: 1; width: 100%; }
     .text-column p { margin: 0 auto; }
 
+    #tools {
+        justify-content:unset;
+        padding-top:2rem;
+    }
+
     .text-column p {
         font-size: 0.9rem;
         line-height: 1.5;
@@ -462,7 +504,7 @@ background-clip: text; /* For other browsers */
     .tools-content h2 {
         font-size: 1.5rem;
         margin-bottom: 2rem;
-        margin-top:2rem;
+        margin-top:4rem;
     }
 
     .logo-grid {
@@ -474,13 +516,45 @@ background-clip: text; /* For other browsers */
     .site-footer {
         font-size: 0.7rem;
         padding: 1rem;
-        width:80%;
+        width:100%;
         margin: 0 auto;
         text-align: center;
     }
+
+    .site-footer .privacy-note {
+    margin: auto;
+    margin-bottom: 1rem;
+    width:100%;
+}
+
     .site-footer p {
         margin: 0 auto;
         text-align:center;
     }
     
+}
+
+@media screen and (max-width: 380px) {
+
+    #tools {
+        padding:0;
+    }
+
+    .logo-grid {
+        gap:20px;
+    }
+    .logo-item {
+        width: 70px; /* Adjusted for smaller screens */
+    }
+    .logo-item p {
+        font-size:0.5rem;
+    }
+
+    .site-footer .privacy-note {
+        font-size: 0.6rem;
+    }
+
+    .site-footer p {
+        font-size: 0.6rem;
+    }
 }
