@@ -1,148 +1,524 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>intelfy</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    <script defer src="https://cloud.umami.is/script.js" data-website-id="e8aa132e-faea-4308-9708-9f21cb5a0850"></script>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>home @ intelfy</title>
 
-    <main>
-        <section id="hero">
-            <header>
-                <img src="logo.svg" alt="intelfy logo" class="logo">
-                <nav>
-                    <ul>
-                        <li><a href="index.html">main</a></li>
-                        <li><a href="https://blog.intelfy.dk">blog</a></li>
-                        <li><a href="https://github.com/intelfy">github</a></li>
-                    </ul>
-                </nav>
-            </header>
-            <video autoplay muted loop playsinline id="background-video" class="hero-background">
-                <source src="https://storage.googleapis.com/video_intelfy/bg.mp4" type="video/mp4">
-            </video>
-            <img id="hero-video-fallback" class="hero-background hidden" src="bgf.png">
-            <div class="hero-content">
-                <div class="hero-text-box">  
-                <div class="pill">$dev_team.exe encountered an unexpected error (resource unavailable, try again later)</div>
-                    <h1>We are working. <span class="unbreakable-group">We are <span class="word-cycler-wrapper"><span id="word-cycler"></span></span></span></h1>
+    <!-- Tailwind CDN for prototype (swap for compiled build) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fonts: Manrope (body) + Sora (headings) -->
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&family=Sora:wght@400;600;800&display=swap" rel="stylesheet" />
+
+    <style>
+      /* ------------------------------------------------------------------
+         Base
+      ------------------------------------------------------------------ */
+      :root {
+        /* Light theme */
+        --bg: #f5f3eb;
+        --nav-h: 72px;            /* page background */
+        --surface: #ffffff;       /* cards, pills */
+        --text: #111111;          /* primary text */
+        --ink: #000000;           /* borders, shadows, accents */
+        --muted: #4b5563;         /* secondary text */
+        --beige: var(--bg);       /* alias used in layout sections */
+        --shadow-inverse: #ffffff; /* white shadow for dark elements */
+        --hi: rgba(0,0,0,.12); /* highlight fill for markers */
+
+        /* Shared canvas (match blog hero) */
+        --content-max: 72rem;
+        --gutter: clamp(16px, 4vw, 56px);
+        --gutter-lg: clamp(24px, 5vw, 72px);
+      }
+      .dark {
+        /* Dark theme */
+        --bg: #0e1114;
+        --nav-h: 72px;
+        --surface: #161a1d;
+        --text: #f5f3eb;
+        --ink: #ffffff;
+        --muted: #c9c9c9;
+        --beige: #0f1215;
+        --shadow-inverse: #000000; /* black shadow for light elements in dark mode */
+        --hi: rgba(255,255,255,.16);
+        color-scheme: dark;
+      }
+      body { font-family: "Manrope", sans-serif; }
+
+      @media (max-width: 767px){
+        :root{ --nav-h: 64px; }
+      }
+
+      /* Headings use Sora */
+      h1, h2, h3, .font-heading { font-family: "Sora", sans-serif; letter-spacing: -0.01em; }
+      .theme-root { background: var(--bg); color: var(--text); }
+
+      /* Global selection colors */
+      .theme-root ::selection { background: var(--ink); color: var(--bg); }
+
+      /* Shared wrap (blog canvas) */
+      .wrap{ max-width: var(--content-max); margin-inline:auto; padding-inline: var(--gutter); }
+      @media (min-width:768px){ .wrap{ padding-inline: var(--gutter-lg); } }
+
+      /* Prefer-reduced-motion: keep it calm */
+      @media (prefers-reduced-motion: reduce) {
+        .no-motion { transition: none !important; animation: none !important; }
+      }
+
+      /* ------------------------------------------------------------------
+         Hero H1 – per-line reveal (okawa-h style)
+      ------------------------------------------------------------------ */
+      [data-js="reveal-lines"] .reveal-line { position: relative; display: inline-block; vertical-align: bottom; }
+      [data-js="reveal-lines"] .reveal-line::before { content: ""; position: absolute; left: 0; top: 0; width: 0; height: 1.1em; background: var(--ink); transform-origin: left; }
+      [data-js="reveal-lines"] [data-reveal-text] { opacity: 0; }
+      @keyframes lineCover { 0% { width: 0; left: 0 } 45% { width: 100%; left: 0 } 55% { width: 100%; left: 0 } 100% { width: 0; left: 100% } }
+      @keyframes lineText  { 0%,45% { opacity: 0 } 55%,100% { opacity: 1 } }
+      [data-js="reveal-lines"].loaded .reveal-line::before { animation: lineCover 1.3s ease-in-out both; animation-delay: var(--d, 0s); }
+      [data-js="reveal-lines"].loaded [data-reveal-text]      { animation: lineText  1.3s ease-in-out both; animation-delay: var(--d, 0s); }
+      @media (prefers-reduced-motion: reduce){
+        [data-js="reveal-lines"] .reveal-line::before { display: none; }
+        [data-js="reveal-lines"] [data-reveal-text] { opacity: 1 !important; animation: none !important; }
+      }
+
+      /* ------------------------------------------------------------------
+         Chat feed (neo‑brutalist bubbles)
+      ------------------------------------------------------------------ */
+      .feed { --gap: 20px; position: relative; max-width: 360px; width: 100%; overflow: hidden; padding-top: 12px; padding-bottom: 14px; box-sizing: content-box; }
+      .feed::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 18px; pointer-events: none; z-index: 3; background: linear-gradient(to bottom, var(--bg), transparent); }
+      .feed-track { display: flex; flex-direction: column; row-gap: var(--gap); will-change: transform; }
+      .msg { display: flex; align-items: flex-start; gap: 12px; will-change: transform, opacity; transition: opacity 420ms ease-out, transform 420ms ease-out; }
+      .msg.exiting   { opacity: 0; transform: translateY(-6px); transition: opacity 220ms ease-in,  transform 220ms ease-in; }
+      .msg.enter-pre { opacity: 0; transform: translateY(6px); }
+      .msg.entering  { opacity: 1; transform: translateY(0); }
+      .avatar { width: 40px; height: 40px; border-radius: 9999px; border: 2px solid var(--ink); object-fit: cover; }
+      .bubble { background: var(--surface); border: 2px solid var(--ink); box-shadow: 8px 8px 0 var(--ink); border-radius: 8px; padding: 10px 14px; font-size: .9rem; font-weight: 600; white-space: normal; word-break: break-word; line-height: 1.25; }
+
+      @media (prefers-reduced-motion: reduce) {
+        .feed-track, .msg { transition: none !important; transform: none !important; }
+        .feed::before { display: none; }
+      }
+
+      /* ------------------------------------------------------------------
+         Theme via CSS variables (light/dark)
+      ------------------------------------------------------------------ */
+      .theme-toggle { position: fixed; right: 1.5rem; bottom: 1.5rem; z-index: 60; }
+
+      /* Neo‑brutalist shadow utilities */
+      .nb-shadow-xs { box-shadow: 2px 2px 0 var(--ink); }
+      .nb-shadow-sm { box-shadow: 4px 4px 0 var(--ink); }
+      .nb-shadow    { box-shadow: 6px 6px 0 var(--ink); }
+      .nb-shadow-lg { box-shadow: 8px 8px 0 var(--ink); }
+      .nb-shadow-xl { box-shadow: 12px 12px 0 var(--ink); }
+      .nb-shadow-inverse { box-shadow: 6px 6px 0 var(--shadow-inverse); }
+
+      /* ------------------------------------------------------------------
+         Highlight utility (Safari-friendly)
+      ------------------------------------------------------------------ */
+      .hi{ background: linear-gradient(180deg, transparent 58%, var(--hi) 58%); padding: 0 .06em; -webkit-box-decoration-break: clone; box-decoration-break: clone; border-radius: 2px; }
+
+      /* ------------------------------------------------------------------
+         Carousels (image + tools)
+      ------------------------------------------------------------------ */
+      .swipe { touch-action: pan-y; } /* allow vertical scroll while swiping */
+
+      .carousel-slide { width:100%; height:100%; object-fit:cover; display:block; }
+
+      /* Tools carousel layout with room for chunky shadows */
+      .tools-carousel { position: relative; overflow: hidden; transition: height .25s ease; padding-bottom: 14px; padding-right: 12px; box-sizing: content-box; }
+      .tools-track { display: flex; will-change: transform; column-gap: var(--tools-gap, 16px); }
+      .tools-slide { width: 100%; flex: 0 0 100%; }
+    </style>
+  </head>
+
+  <body class="antialiased text-[var(--text)] ">
+    <div id="appRoot" class="theme-root">
+
+      <!-- ============================================================= -->
+      <!-- HERO -------------------------------------------------------- -->
+      <!-- ============================================================= -->
+      <section class="relative min-h-[100svh] pt-[calc(var(--nav-h)+20px)] pb-12 flex items-center">
+        <!-- Top nav (absolute, non-sticky) -->
+        <nav class="absolute top-4 left-0 right-0 z-50">
+          <div class="wrap flex items-center justify-between">
+            <a href="#" class="inline-flex items-center border-2 border-[var(--ink)] rounded-full px-4 py-2 bg-[var(--surface)] nb-shadow font-extrabold tracking-tight">intelfy</a>
+
+            <!-- Desktop links -->
+            <div class="hidden md:flex items-center gap-3">
+              <a href="index.html" class="inline-flex items-center border-2 border-[var(--ink)] rounded-full px-4 py-2 bg-[var(--surface)] nb-shadow hover:-translate-y-0.5 transition font-semibold">main</a>
+              <a href="https://blog.intelfy.dk" class="inline-flex items-center border-2 border-[var(--ink)] rounded-full px-4 py-2 bg-[var(--surface)] nb-shadow hover:-translate-y-0.5 transition font-semibold">blog</a>
+              <a href="https://github.com/intelfy" class="inline-flex items-center border-2 border-[var(--ink)] rounded-full px-4 py-2 bg-[var(--surface)] nb-shadow hover:-translate-y-0.5 transition font-semibold">github</a>
+              <a href="mailto:thomas@intelfy.dk" class="inline-flex items-center border-2 border-[var(--ink)] rounded-full px-4 py-2 bg-[var(--surface)] nb-shadow hover:-translate-y-0.5 transition font-semibold">contact</a>
+            </div>
+
+            <!-- Mobile hamburger -->
+            <button id="navToggle" class="md:hidden border-2 border-[var(--ink)] rounded-full w-11 h-11 bg-[var(--surface)] grid place-items-center nb-shadow" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+          </div>
+          <div id="mobileMenu" class="md:hidden absolute right-[var(--gutter)] top-16 flex flex-col gap-2 opacity-0 scale-95 pointer-events-none transition-all duration-200">
+            <a href="index" class="inline-flex items-center border-2 border-[var(--ink)] rounded-full px-4 py-2 bg-[var(--surface)] nb-shadow font-semibold">main</a>
+            <a href="https://blog.intelfy.dk" class="inline-flex items-center border-2 border-[var(--ink)] rounded-full px-4 py-2 bg-[var(--surface)] nb-shadow font-semibold">blog</a>
+            <a href="https://github.com/intelfy" class="inline-flex items-center border-2 border-[var(--ink)] rounded-full px-4 py-2 bg-[var(--surface)] nb-shadow font-semibold">github</a>
+            <a href="mailto:thomas@intelfy.dk" class="inline-flex items-center border-2 border-[var(--ink)] rounded-full px-4 py-2 bg-[var(--surface)] nb-shadow font-semibold">contact</a>
+          </div>
+        </nav>
+
+        <div class="wrap grid md:grid-cols-12 gap-10 items-center">
+          <div class="md:col-span-7 max-w-2xl">
+            <h1 id="heroTitle" data-js="reveal-lines" class="font-extrabold leading-[1.05] text-[clamp(2.25rem,6vw,3.6rem)]">we build complex, <span class="hi">ai-augmented solutions</span> for really simple problems.</h1>
+            <p class="mt-6 max-w-[36ch] md:text-lg leading-relaxed">we're still in stealth while we build some pretty cool stuff. it's basically rocket science but for web apps. you're going to love it. get a taste below, now that you're here anyway.</p>
+            <div class="mt-10 flex items-center gap-4">
+              <a href="#contact" class="bg-[var(--ink)] text-[var(--bg)] py-3 px-6 rounded-full nb-shadow-inverse transition hover:opacity-90 focus:outline-none focus:ring-4 focus:ring-[var(--ink)]/30">Get in touch</a>
+              <a href="#work" class="inline-flex items-center underline underline-offset-4 decoration-2 decoration-[var(--ink)] hover:text-[var(--muted)] leading-none">See our work</a>
+            </div>
+          </div>
+
+          <!-- Chat feed – hidden on mobile for clarity -->
+          <div class="hidden md:flex md:col-span-5 justify-center mt-12 md:mt-0" aria-hidden="true">
+            <div class="feed max-w-[340px]" id="feed">
+              <ul class="feed-track" id="feedTrack">
+                <li class="msg"><img src="lars.png" class="avatar" alt="" /><span class="bubble">Lars: i hate JSON schemas</span></li>
+                <li class="msg"><img src="sara.png" class="avatar" alt="" /><span class="bubble">Sara: redeploying -- let's pray.</span></li>
+                <li class="msg"><img src="bot.png" class="avatar" alt="" /><span class="bubble">Bot: error on line "all of them"</span></li>
+                <li class="msg"><img src="martin.png" class="avatar" alt="" /><span class="bubble">Martin: we'll need more coffee</span></li>
+                <li class="msg"><img src="anna.png" class="avatar" alt="" /><span class="bubble">Anna: so espresso round two?</span></li>
+                <li class="msg"><img src="thomas.png" class="avatar" alt="" /><span class="bubble">Thomas: 1M token api calls?!</span></li>
+                <li class="msg"><img src="bot.png" class="avatar" alt="" /><span class="bubble">Bot: oh look, more errors</span></li>
+                <li class="msg"><img src="sara.png" class="avatar" alt="" /><span class="bubble">Sara: office sleepover -- yay!</span></li>
+                <li class="msg"><img src="bot.png" class="avatar" alt="" /><span class="bubble">Bot: and even more errors</span></li>
+                <li class="msg"><img src="lars.png" class="avatar" alt="" /><span class="bubble">Lars: i prefer front-end tbh</span></li>
+                <li class="msg"><img src="thomas.png" class="avatar" alt="" /><span class="bubble">Thomas: WHY A 1M CALL?!?</span></li>
+                <li class="msg"><img src="anna.png" class="avatar" alt="" /><span class="bubble">Anna: a pot of espresso then.</span></li>
+              </ul>
+            </div>
+          </div>
         </div>
-        <p>[just now] dm from <span class="hello" style="font-weight:600;"><a href="mailto:hello@intelfy.dk">hello@intelfy.dk</a></span>:</p><p>___</p><p>Hi. We're still in stealth while we build some pretty cool complex AI-augmented solutions to really simple problems. It's quite something. It's basically rocket science but for web apps. You're going to love it. But for now, you'll have to wait. There's a taste below, however.<br />___</p>
-                </div>
-            
-            <a href="#showcase" class="scroll-down">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                </svg>
-            </a>
-        </section>
-
-        <section id="showcase">
-            <div class="showcase-container">
-                <div class="slider-column">
-    <div class="slider-image-container">
-        <div id="slider-image" class="slider-image">
-             <img src="1.png" alt="Gift Guide landing page">
-        </div>
-        <button id="prev-button" class="slider-arrow">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
-        </button>
-        <button id="next-button" class="slider-arrow">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
-        </button>
-    </div>
-    <div class="slider-nav">
-        <span class="dot active" data-index="0"></span>
-        <span class="dot" data-index="1"></span>
-        <span class="dot" data-index="2"></span>
-        <span class="dot" data-index="3"></span>
-    </div>
-</div>
-                <div class="text-column">
-                    <div id="slider-text-content">
-                        <h2>Et voilà! An AI gift guide. But wait!</h2>
-                        <p>On the surface, this seems like a pretty simple web app. You open the site, you answer a few questions, we recommend the perfect gift for your mom, your partner, whomever it is you like on this particular day.</p>
-                    </div>
-                    </div>
-                </div>
-            </div>
-            </div>
-
-        <a href="#tools" id="showcase-scroll-down" class="scroll-down">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-            </svg>
-        </a>
-
-    
-        </section>
-
-
-        <section id="tools">
-            <div class="tools-content">
-                <h2>Some of the tools we are working with:</h2>
-                <div class="logo-grid">
-                    <div class="logo-item">
-                        <a href="https://ghost.org" target="_blank">
-                            <img src="ghost.png" alt="Ghost logo">
-                            <p>Ghost.org</p>
-                        </a>
-                    </div>
-                    <div class="logo-item">
-                        <a href="https://github.com" target="_blank">
-                            <img src="github.svg" alt="GitHub logo">
-                            <p>GitHub</p>
-                        </a>
-                    </div>
-                    <div class="logo-item">
-                        <a href="https://openai.com" target="_blank">
-                            <img src="openai.svg" alt="OpenAI logo">
-                            <p>OpenAI</p>
-                        </a>
-                    </div>
-                    <div class="logo-item">
-                        <a href="https://gemini.google.com" target="_blank">
-                            <img src="gemini.svg" alt="Google Gemini logo">
-                            <p>Google Gemini</p>
-                        </a>
-                    </div>
-                    <div class="logo-item">
-                        <a href="https://coolify.io" target="_blank">
-                            <img src="coolify.svg" alt="Coolify logo">
-                            <p>Coolify</p>
-                        </a>
-                    </div>
-                    <div class="logo-item">
-                        <a href="https://mongodb.com" target="_blank">
-                            <img src="mongodb.svg" alt="MongoDB logo">
-                            <p>MongoDB</p>
-                        </a>
-                    </div>
-                    <div class="logo-item">
-                        <a href="https://umami.is" target="_blank">
-                            <img src="umami.svg" alt="Umami logo">
-                            <p>Umami</p>
-                        </a>
-                    </div>
-                    <div class="logo-item">
-                        <a href="https://getoutline.com" target="_blank">
-                            <img src="outline.svg" alt="Outline logo">
-                            <p>Outline</p>
-                        </a>
-                    </div>
-                </div> 
-            </div>
-            <footer class="site-footer"><p class="privacy-note">we believe strongly in a <span class="hello">free, open, and private internet for all.</span> we self-host our tools to ensure data control, GDPR-compliance and, most importantly, user privacy. we do not use cookies anywhere, and we vehemently reject cookie-based analytics trackers like Google Analytics. we never share data with AI providers on live applications, and we anonymize all API calls. you will not have to worry about your data being safe with us, because we - quite frankly - do not want your data. what little, fully anonymized data, we do keep for maintenance purposes, we store entirely on private machines within the EU. our blog may contain affiliate links to external providers (self-hosting gets expensive), but we will declare it openly and visibly and provide non-affiliate links too. we make all our repositories available online.</p>
-        <p>&copy; 2025 intelfy.dk. all rights reserved. || contact us at <span class="hello"><a href="mailto:hello@intelfy.dk">hello@intelfy.dk</a></span></p>
-    </footer>
       </section>
-    </main>
-    <script src="script.js"></script>
-</body>
+
+      <!-- ============================================================= -->
+      <!-- ABOUT (Section 2) – full viewport, white, TEXT RIGHT --------- -->
+      <!-- ============================================================= -->
+      <section id="about" class="min-h-[100svh] bg-[var(--surface)] text-[var(--text)] flex items-center py-16 md:py-24">
+        <div class="wrap grid md:grid-cols-2 gap-12 items-center">
+          <!-- Visual left -->
+          <div class="order-1" id="aboutVisualCol">
+            <div class="relative aspect-square bg-[var(--beige)] rounded-xl border-2 border-[var(--ink)] nb-shadow-xl overflow-hidden swipe" id="aboutCarousel">
+              <!-- Slides -->
+              <img src="1.png" width="960" height="960" class="carousel-slide absolute inset-0 w-full h-full object-cover opacity-100 transition-opacity duration-500" alt="a screenshot of our gift guide" data-caption="a simple single-page application" />
+              <img src="2.png" width="960" height="960" class="carousel-slide absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500" alt="a screenshot of the theoretical math behind it" data-caption="or is it?" />
+              <img src="3.png" width="960" height="960" class="carousel-slide absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500" alt="a screenshot of the practical math" data-caption="headache-inducing complexity" />
+              <img src="4.png" width="960" height="960" class="carousel-slide absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500" alt="a screenshot of an initial product json" data-caption="380+-dimensional semantic embedding" />
+
+              <!-- Controls -->
+              <div class="absolute inset-x-0 bottom-4 flex justify-end gap-2 pr-4 z-10">
+                <button class="carousel-btn prev border-2 border-[var(--ink)] bg-[var(--surface)] rounded-full w-9 h-9 grid place-items-center nb-shadow-sm" aria-label="Previous slide">‹</button>
+                <button class="carousel-btn next border-2 border-[var(--ink)] bg-[var(--surface)] rounded-full w-9 h-9 grid place-items-center nb-shadow-sm" aria-label="Next slide">›</button>
+              </div>
+
+              <!-- Dots -->
+              <div class="absolute inset-x-0 bottom-4 flex justify-center gap-2">
+                <span class="dot w-2.5 h-2.5 border-2 border-[var(--ink)] bg-[var(--surface)] rounded-full nb-shadow-xs opacity-100"></span>
+                <span class="dot w-2.5 h-2.5 border-2 border-[var(--ink)] bg-[var(--surface)] rounded-full nb-shadow-xs opacity-60"></span>
+                <span class="dot w-2.5 h-2.5 border-2 border-[var(--ink)] bg-[var(--surface)] rounded-full nb-shadow-xs opacity-60"></span>
+                <span class="dot w-2.5 h-2.5 border-2 border-[var(--ink)] bg-[var(--surface)] rounded-full nb-shadow-xs opacity-60"></span>
+              </div>
+            </div>
+            <div class="mt-4 flex justify-center">
+              <span id="aboutCaption" class="inline-block bg-[var(--surface)] border-2 border-[var(--ink)] rounded-lg px-3 py-1 font-bold nb-shadow transition-opacity duration-300">Zero‑setup deployments</span>
+            </div>
+          </div>
+
+          <!-- Text right (synced to carousel) -->
+          <div class="order-2">
+            <div id="aboutCopy" class="transition-opacity duration-300">
+              <h2 id="aboutTitle" class="text-3xl md:text-4xl font-bold mb-4">et voilà! an AI gift guide. but wait!</h2>
+              <p id="aboutPara" class="leading-relaxed mb-6">on the surface, this seems like a pretty simple web app.</p>
+              <ul id="aboutList" class="space-y-4">
+              <li class="flex items-start gap-2"><span class="mt-1 block h-2 w-2 rounded-full bg-[var(--ink)]"></span><span>you open up the site ...</span></li>
+              <li class="flex items-start gap-2"><span class="mt-1 block h-2 w-2 rounded-full bg-[var(--ink)]"></span><span>you answer a few questions ...</span></li>
+              <li class="flex items-start gap-2"><span class="mt-1 block h-2 w-2 rounded-full bg-[var(--ink)]"></span><span>we hand you the perfect gift for your mom.</span></li>
+            </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================= -->
+      <!-- PRINCIPLES (Section 3) – beige, TEXT LEFT ------------------- -->
+      <!-- ============================================================= -->
+      <section id="principles" class="min-h-[100svh] bg-[var(--beige)] text-[var(--text)] flex items-center py-16 md:py-24">
+        <div class="wrap grid md:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 class="text-3xl md:text-5xl font-extrabold mb-4">we all want a free and private internet</h2>
+            <p class="leading-relaxed mb-6 max-w-xl">despite collecting thousands of <b>highly anonymized</b> data points, we believe strongly in a free, open, and private internet for all. we self-host all our tools for your privacy & we never share user data with AI providers. moreover, we make all our github repos publicly available.</p>
+            <p class="leading-relaxed mb-6 max-w-xl">that means total and proactive GDPR-compliance. it means zero cookies. ever. and it means we share no training data from users with AI providers.</p>
+          </div>
+          <div class="relative aspect-video bg-[var(--surface)] rounded-xl border-2 border-[var(--ink)] nb-shadow-xl overflow-hidden flex items-center justify-center">
+            <div class="text-center p-8">
+              <div class="inline-block border-2 border-[var(--ink)] px-4 py-2 nb-shadow-lg rounded-lg font-bold">privacy‑first.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================= -->
+      <!-- TOOLS (Section 4) – white, TEXT RIGHT ----------------------- -->
+      <!-- ============================================================= -->
+      <section id="work" class="min-h-[100svh] bg-[var(--surface)] text-[var(--text)] flex items-center py-16 md:py-24">
+        <div class="wrap grid md:grid-cols-2 gap-12 items-center">
+          <!-- Visual left: 2 slides × 4 cards each -->
+          <div class="order-1">
+            <div id="toolsCarousel" class="tools-carousel swipe mt-6 md:mt-8">
+              <div class="tools-track transition-transform duration-500 ease-out">
+                <!-- Slide 1 -->
+                <div class="tools-slide grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div class="border-2 border-[var(--ink)] rounded-xl p-4 nb-shadow-lg bg-[var(--beige)]"><h3 class="font-extrabold mb-1">ghost.org</h3><p class="text-sm">a self-hosted, open-source, lightweight CMS system.</p></div>
+                  <div class="border-2 border-[var(--ink)] rounded-xl p-4 nb-shadow-lg bg-[var(--beige)]"><h3 class="font-extrabold mb-1">github</h3><p class="text-sm">the gold standard of code accessibility and transparency.</p></div>
+                  <div class="border-2 border-[var(--ink)] rounded-xl p-4 nb-shadow-lg bg-[var(--beige)]"><h3 class="font-extrabold mb-1">mongoDB</h3><p class="text-sm">self-hosted noSQL database management -- hosted in the EU.</p></div>
+                  <div class="border-2 border-[var(--ink)] rounded-xl p-4 nb-shadow-lg bg-[var(--beige)]"><h3 class="font-extrabold mb-1">umami</h3><p class="text-sm">a privacy-first, cookie-less analytics solution.</p></div>
+                </div>
+                <!-- Slide 2 -->
+                <div class="tools-slide grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div class="border-2 border-[var(--ink)] rounded-xl p-4 nb-shadow-lg bg-[var(--beige)]"><h3 class="font-extrabold mb-1">coolify</h3><p class="text-sm">an open-source Netlify/Heroku competitor for our self-hosted instances.</p></div>
+                  <div class="border-2 border-[var(--ink)] rounded-xl p-4 nb-shadow-lg bg-[var(--beige)]"><h3 class="font-extrabold mb-1">outline</h3><p class="text-sm">because we don't want to share our own data with Notion either.</p></div>
+                  <div class="border-2 border-[var(--ink)] rounded-xl p-4 nb-shadow-lg bg-[var(--beige)]"><h3 class="font-extrabold mb-1">openAI</h3><p class="text-sm">surprisingly pro-privacy. also we never share training data with them.</p></div>
+                  <div class="border-2 border-[var(--ink)] rounded-xl p-4 nb-shadow-lg bg-[var(--beige)]"><h3 class="font-extrabold mb-1">google gemini</h3><p class="text-sm">we, of course, never share training data with Google's models either.</p></div>
+                </div>
+              </div>
+            </div>
+            <!-- Controls below -->
+            <div id="toolsControls" class="mt-4 flex items-center justify-center gap-3">
+              <button id="toolsPrev" class="border-2 border-[var(--ink)] bg-[var(--surface)] rounded-full w-9 h-9 grid place-items-center nb-shadow-sm" aria-label="Previous">‹</button>
+              <div class="flex gap-2">
+                <span class="tools-dot w-2.5 h-2.5 border-2 border-[var(--ink)] bg-[var(--surface)] rounded-full nb-shadow-xs opacity-60"></span>
+                <span class="tools-dot w-2.5 h-2.5 border-2 border-[var(--ink)] bg-[var(--surface)] rounded-full nb-shadow-xs opacity-60"></span>
+              </div>
+              <button id="toolsNext" class="border-2 border-[var(--ink)] bg-[var(--surface)] rounded-full w-9 h-9 grid place-items-center nb-shadow-sm" aria-label="Next">›</button>
+            </div>
+          </div>
+
+          <!-- Text right -->
+          <div class="order-2">
+            <h2 class="text-3xl md:text-5xl font-extrabold mb-4">we work with similarly-minded providers</h2>
+            <p class="leading-relaxed mb-6 max-w-xl">we are only as good as the third parties we invite into our ecosystem. we prioritize partners who share our values and commitment to user privacy, and we share as little data as possible, keeping everything on self-hosted, european servers.</p>
+            <div class="flex gap-3 text-sm">
+              <a href="#" class="inline-block border-2 border-[var(--ink)] px-4 py-2 rounded-full nb-shadow hover:-translate-y-0.5 transition">See docs</a>
+              <a href="https://github.com/intelfy" class="inline-block border-2 border-[var(--ink)] px-4 py-2 rounded-full nb-shadow hover:-translate-y-0.5 transition">GitHub</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================= -->
+      <!-- FOOTER ------------------------------------------------------ -->
+      <!-- ============================================================= -->
+      <footer class="py-12 bg-[var(--beige)] text-sm text-[var(--muted)]">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between gap-6">
+          <p>© 2025 intelfy. all rights reserved. proudly built in Copenhagen.</p>
+          <nav class="flex gap-4">
+          </nav>
+        </div>
+      </footer>
+
+    </div>
+    <!-- /theme-root -->
+
+    <!-- Floating theme toggle -->
+    <button id="themeToggle" class="theme-toggle border-2 border-[var(--ink)] rounded-full w-14 h-14 bg-[var(--surface)] grid place-items-center nb-shadow-lg hover:-translate-y-0.5 transition" aria-label="Toggle dark mode" aria-pressed="false">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+
+    <script>
+      /* =============================================================
+         Chat feed controller (pop-in, 5 visible)
+      ============================================================= */
+      (function(){
+        const VISIBLE = 5, STEP_MS = 2500, SLIDE_MS = 480, EASE = 'cubic-bezier(.2,.8,.2,1)';
+        const feed = document.getElementById('feed');
+        const track = document.getElementById('feedTrack');
+        if (!feed || !track) return;
+        let timer = null, paused = false;
+        const px = (n)=> n + 'px';
+        const getGap = ()=> parseFloat(getComputedStyle(track).rowGap || '0');
+        const computeMaxWindowHeight = ()=>{
+          const items = Array.from(track.children), n = items.length, gap = getGap();
+          if (!n) return 0; let maxH = 0; const windows = Math.max(1, n - VISIBLE + 1);
+          for (let start=0; start<windows; start++){ let h=0, count=Math.min(VISIBLE, n-start); for (let i=0;i<count;i++) h+=items[start+i].offsetHeight; h+=gap*(count-1); maxH=Math.max(maxH,h); }
+          return maxH;
+        };
+        const setFeedHeight = ()=> feed.style.height = px(Math.ceil(computeMaxWindowHeight()));
+        const cleanup = (el)=> el && el.classList.remove('exiting','enter-pre','entering');
+        const step = ()=>{
+          if (paused) return; const children = track.children; if (!children.length) return; setFeedHeight();
+          const first = children[0], newcomer = children[VISIBLE];
+          cleanup(first); cleanup(newcomer);
+          if (newcomer) { newcomer.classList.add('enter-pre'); requestAnimationFrame(()=>{ newcomer.classList.add('entering'); newcomer.classList.remove('enter-pre'); }); }
+          first.classList.add('exiting');
+          const delta = first.offsetHeight + getGap();
+          track.style.transition = 'transform '+SLIDE_MS+'ms '+EASE;
+          track.style.transform = 'translateY('+(-delta)+'px)';
+          const onDone = ()=>{ track.removeEventListener('transitionend', onDone); track.style.transition='none'; track.style.transform='translateY(0)'; cleanup(first); cleanup(newcomer); track.appendChild(first); setFeedHeight(); schedule(); };
+          track.addEventListener('transitionend', onDone);
+        };
+        const schedule = ()=>{ clearTimeout(timer); timer = setTimeout(step, STEP_MS); };
+        feed.addEventListener('mouseenter', ()=>{ paused=true; clearTimeout(timer); });
+        feed.addEventListener('mouseleave', ()=>{ paused=false; schedule(); });
+        window.addEventListener('resize', setFeedHeight);
+        if (window.MutationObserver) new MutationObserver(()=> setFeedHeight()).observe(track,{childList:true,subtree:true,characterData:true});
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(setFeedHeight).catch(()=>{});
+        setFeedHeight(); schedule();
+      })();
+
+      /* =============================================================
+         Swipe helper (pointer events)
+      ============================================================= */
+      function addSwipe(el, onLeft, onRight){
+  if(!el) return;
+  let sx=0, sy=0, active=false, pid=null;
+  const TH=40;
+  const isInteractive = (t)=> t && t.closest('button, a, input, textarea, select, [role="button"], [data-nodrag]');
+
+  el.addEventListener('pointerdown', (e)=>{
+    if (isInteractive(e.target)) return;        // don't hijack clicks on controls
+    active = true; pid = e.pointerId; sx = e.clientX; sy = e.clientY;
+    el.setPointerCapture && el.setPointerCapture(pid);
+  });
+
+  el.addEventListener('pointerup', (e)=>{
+    if(!active) return;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    active = false;
+    try { el.releasePointerCapture && el.releasePointerCapture(pid); } catch(_){}
+    if (Math.abs(dx) > TH && Math.abs(dx) > Math.abs(dy) * 1.2) {
+      dx < 0 ? onLeft && onLeft() : onRight && onRight();
+    }
+  });
+
+  el.addEventListener('pointercancel', ()=>{ active=false; });
+}
+
+      /* =============================================================
+         About carousel (manual, 1:1, syncs right-hand copy)
+      ============================================================= */
+      (function(){
+        const root = document.getElementById('aboutCarousel'); if (!root) return;
+        const slides = Array.from(root.querySelectorAll('.carousel-slide'));
+        const dots   = Array.from(root.querySelectorAll('.dot'));
+        const prev   = root.querySelector('.carousel-btn.prev');
+        const next   = root.querySelector('.carousel-btn.next');
+        const captionSpan = document.getElementById('aboutCaption');
+        const copyWrap = document.getElementById('aboutCopy');
+        const copyTitle = document.getElementById('aboutTitle');
+        const copyPara  = document.getElementById('aboutPara');
+        const copyList  = document.getElementById('aboutList');
+        const copyData = [
+          { title:'et voilà! an AI gift guide. but wait!', para:'on the surface, this seems like a pretty simple web app.', items:['you open up the site ...','you answer a few questions ...','we hand you the perfect gift for your mom.'] },
+          { title:'but you are not seeing the whole story.',    para:'see, it turns out \'perfect\' is kind of a high bar. Users expect:', items:['niche interests accounted for.','deeply personalized question flows.','spot-on recommendations every time.'] },
+          { title:'in eCommerce, they call this the multi-armed bandit',  para:'And it is a pain to solve. An expensive one. It requires',   items:['complex many-dimensional tag embeddings (ours is 384).','advanced math like IF-IDF scoring and Thompson Sampling','hundreds thousands of consumer profile data points'] },
+          { title:'you simply cannot do this for a niche with humans',   para:'humans cost money and want a work/life-balance. it would cost billions.',         items:['but with large language models it is doable.','from semantic embeddings to complex reasoning and perfecting question flows.','to consistent, recurring self-optimization and simulation tests.'] }
+        ];
+        let i = 0; const CAP_FADE = 200;
+        function renderCopy(idx){ if(!copyWrap) return; copyWrap.style.opacity='0'; setTimeout(()=>{ const d=copyData[idx]; copyTitle.textContent=d.title; copyPara.textContent=d.para; copyList.innerHTML=d.items.map(t=>`<li class="flex items-start gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg><span>${t}</span></li>`).join(''); copyWrap.style.opacity='1'; }, CAP_FADE); }
+        function show(n){ i=(n+slides.length)%slides.length; slides.forEach((img,idx)=>{ img.classList.toggle('opacity-100', idx===i); img.classList.toggle('opacity-0', idx!==i); }); dots.forEach((d,idx)=>{ d.style.opacity = idx===i ? '1' : '.6'; d.setAttribute('aria-current', idx===i ? 'true' : 'false'); }); if(captionSpan){ captionSpan.style.opacity='0'; setTimeout(()=>{ captionSpan.textContent = slides[i].dataset.caption || ''; captionSpan.style.opacity='1'; }, CAP_FADE);} renderCopy(i); }
+        const nextSlide = ()=> show(i+1); const prevSlide = ()=> show(i-1);
+        next && next.addEventListener('click', nextSlide); prev && prev.addEventListener('click', prevSlide); dots.forEach((d,idx)=> d.addEventListener('click', ()=> show(idx)));
+        show(0); addSwipe(root, nextSlide, prevSlide);
+      })();
+
+      /* =============================================================
+         Tools carousel (2 slides of 4 cards)
+      ============================================================= */
+      (function(){
+        const root = document.getElementById('toolsCarousel'); if(!root) return;
+        const track = root.querySelector('.tools-track');
+        const slides = Array.from(root.querySelectorAll('.tools-slide'));
+        const prev = document.getElementById('toolsPrev');
+        const next = document.getElementById('toolsNext');
+        const dots = Array.from(document.querySelectorAll('.tools-dot'));
+        let i = 0;
+        function setHeight(){ const styles = getComputedStyle(root); const pad = parseFloat(styles.paddingTop||'0') + parseFloat(styles.paddingBottom||'0'); const h = slides[i].offsetHeight + pad; root.style.height = h + 'px'; }
+        function show(n){ i=(n+slides.length)%slides.length; const cs=getComputedStyle(track); const gap=parseFloat(cs.columnGap||cs.gap||'0'); const slideW = slides[0].offsetWidth; track.style.transform = 'translateX(' + (-(slideW + gap)*i) + 'px)'; dots.forEach((d,idx)=> d.style.opacity = idx===i ? '1' : '.6'); setHeight(); }
+        const nextSlide = ()=> show(i+1); const prevSlide = ()=> show(i-1);
+        next && next.addEventListener('click', nextSlide); prev && prev.addEventListener('click', prevSlide); dots.forEach((d,idx)=> d.addEventListener('click', ()=> show(idx)));
+        window.addEventListener('resize', ()=> show(i));
+        show(0); addSwipe(root, nextSlide, prevSlide);
+      })();
+
+      /* =============================================================
+         Nav (mobile toggle)
+      ============================================================= */
+      (function(){
+        const btn = document.getElementById('navToggle'); const menu = document.getElementById('mobileMenu'); if(!btn||!menu) return;
+        const openMenu = (open)=>{ btn.setAttribute('aria-expanded', String(open)); menu.classList.toggle('opacity-0', !open); menu.classList.toggle('pointer-events-none', !open); menu.classList.toggle('scale-95', !open); };
+        btn.addEventListener('click', ()=>{ const isOpen = btn.getAttribute('aria-expanded')==='true'; openMenu(!isOpen); btn.innerHTML = !isOpen ? '<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>'; });
+        menu.querySelectorAll('a').forEach(a=> a.addEventListener('click', ()=> openMenu(false)));
+      })();
+
+      /* =============================================================
+         Headline per-line reveal (on load)
+      ============================================================= */
+      (function(){
+        const el = document.getElementById('heroTitle'); if(!el) return;
+        function wrapTextNodes(node){
+          if(node.nodeType === Node.TEXT_NODE){
+            const parts=node.textContent.split(' ');
+            const frag=document.createDocumentFragment();
+            parts.forEach((p,idx)=>{ if(idx>0) frag.appendChild(document.createTextNode(' ')); if(!p) return; const s=document.createElement('span'); s.className='reveal-token'; s.textContent=p; frag.appendChild(s); });
+            node.parentNode.replaceChild(frag,node);
+          } else if(node.nodeType === Node.ELEMENT_NODE){
+            Array.from(node.childNodes).forEach(wrapTextNodes);
+          }
+        }
+        function computeLinesAndWrap(){
+          Array.from(el.childNodes).forEach(wrapTextNodes);
+          const tokens=Array.from(el.querySelectorAll('.reveal-token'));
+          if(!tokens.length){ el.classList.add('loaded'); return; }
+          // group by visual line (offsetTop)
+          const lines=[]; let curTop=null, cur=[];
+          tokens.forEach(tk=>{ const top=tk.offsetTop; if(curTop===null) curTop=top; if(Math.abs(top-curTop)>2){ lines.push(cur); cur=[]; curTop=top; } cur.push(tk); });
+          if(cur.length) lines.push(cur);
+          // Wrap each line, but split into runs that share the same parent to avoid Range InvalidState errors
+          lines.forEach((arr,i)=>{
+            let j=0;
+            while(j < arr.length){
+              const parent = arr[j].parentNode;
+              let k=j;
+              while(k < arr.length && arr[k].parentNode === parent) k++;
+              const first = arr[j], last = arr[k-1];
+              const range=document.createRange();
+              range.setStartBefore(first); range.setEndAfter(last);
+              const outer=document.createElement('span'); outer.className='reveal-line'; outer.style.setProperty('--d',(i*0.08)+'s');
+              try{
+                range.surroundContents(outer);
+                const inner=document.createElement('span'); inner.setAttribute('data-reveal-text','');
+                while(outer.firstChild) inner.appendChild(outer.firstChild);
+                outer.appendChild(inner);
+              }catch(e){
+                // Fail-safe: if any browser still complains, skip wrapping for this segment
+                console.warn('Reveal wrap skipped for a segment:', e);
+              }
+              j = k;
+            }
+          });
+          requestAnimationFrame(()=> el.classList.add('loaded'));
+        }
+        if(document.fonts && document.fonts.ready){ document.fonts.ready.then(computeLinesAndWrap).catch(computeLinesAndWrap); } else { computeLinesAndWrap(); }
+      })();
+
+      /* =============================================================
+         Light/Dark theme toggle (global invert)
+      ============================================================= */
+      (function(){
+        const btn = document.getElementById('themeToggle'); if(!btn) return;
+        const SUN = '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>';
+        const MOON = '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+        function apply(mode){ const dark = mode==='dark'; document.body.classList.toggle('dark', dark); btn.setAttribute('aria-pressed', String(dark)); btn.innerHTML = dark ? SUN : MOON; localStorage.setItem('theme', dark ? 'dark' : 'light'); }
+        const saved = localStorage.getItem('theme'); const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; apply(saved ? saved : (prefersDark ? 'dark' : 'light'));
+        btn.addEventListener('click', ()=> apply(document.body.classList.contains('dark') ? 'light' : 'dark'));
+        if(!saved && window.matchMedia){ const mq = window.matchMedia('(prefers-color-scheme: dark)'); const handler=(e)=> apply(e.matches ? 'dark' : 'light'); mq.addEventListener ? mq.addEventListener('change', handler) : mq.addListener(handler); }
+      })();
+    </script>
+  </body>
 </html>
